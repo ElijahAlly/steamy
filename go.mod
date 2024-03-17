@@ -1,11 +1,10 @@
-module github.com/wing8169/golang-htmx-chat-app
 
-go 1.21.3
+go 1.22.1
 
 require github.com/labstack/echo-jwt v0.0.0-20221127215225-c84d41a71003
 
 require (
-	github.com/a-h/templ v0.2.432 // indirect
+	github.com/a-h/templ v0.2.598 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
 	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
