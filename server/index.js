@@ -17,11 +17,11 @@ await createApp(httpServer, {
   },
   sessionSecrets: ["changeit"],
   cors: {
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173"], // TODO: change/add to https://steamy.io for production
     credentials: true,
   },
 });
 
-httpServer.listen(3000, () => {
-  logger.info("server listening at http://localhost:3000");
+httpServer.listen(8081, () => {
+  logger.info("server listening at http://localhost:8081");
 });

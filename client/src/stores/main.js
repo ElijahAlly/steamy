@@ -35,11 +35,11 @@ export const useMainStore = defineStore("main", {
     bindEvents() {
       if (process.env.NODE_ENV !== "production") {
         socket.onAny((...args) => {
-          console.log("incoming", args);
+          console.log("---> incoming socket...", args);
         });
 
         socket.onAnyOutgoing((...args) => {
-          console.log("outgoing", args);
+          console.log("---> outgoing socket...", args);
         });
       }
 
@@ -60,10 +60,6 @@ export const useMainStore = defineStore("main", {
       socket.on("channel:created", (channel) => this.addChannel(channel));
       socket.on("channel:joined", (channel) => this.addChannel(channel));
 
-      socket.on("message:sent", (message) => {
-        this.addMessage(message, true);
-      });
-
       socket.on("user:connected", (userId) => {
         if (this.users.has(userId)) {
           this.users.get(userId).isOnline = true;
@@ -72,8 +68,13 @@ export const useMainStore = defineStore("main", {
 
       socket.on("user:disconnected", (userId) => {
         if (this.users.has(userId)) {
+          console.log(`${this.users[userId].username} has disconnected`);
           this.users.get(userId).isOnline = false;
         }
+      });
+
+      socket.on("message:sent", (message) => {
+        this.addMessage(message, true);
       });
 
       socket.on("message:typing", async ({ channelId, userId, isTyping }) => {
@@ -96,7 +97,6 @@ export const useMainStore = defineStore("main", {
         }
       });
     },
-
     async init() {
       socket.connect();
 
@@ -112,7 +112,6 @@ export const useMainStore = defineStore("main", {
 
       return this.publicChannels[0].id;
     },
-
     clear() {
       this.isInitialized = false;
       this.currentUser = {};
@@ -120,11 +119,9 @@ export const useMainStore = defineStore("main", {
       this.users.clear();
       this.selectedChannelId = undefined;
     },
-
     setCurrentUser(user) {
       this.currentUser = user;
     },
-
     addChannel(channel) {
       if (this.channels.has(channel.id)) {
         const existingChannel = this.channels.get(channel.id);
@@ -145,14 +142,12 @@ export const useMainStore = defineStore("main", {
         this.channels.set(channel.id, channel);
       }
     },
-
     async selectChannel(channelId) {
       this.selectedChannelId = channelId;
 
       await this.loadMessagesForSelectedChannel();
       await this.ackLastMessageIfNecessary();
     },
-
     async loadMessagesForSelectedChannel(order = "backward", force = false) {
       const channel = this.selectedChannel;
 
@@ -194,7 +189,16 @@ export const useMainStore = defineStore("main", {
 
       await this.ackLastMessageIfNecessary();
     },
+    async ackLastMessageIfNecessary() {
+      if (this.selectedChannel?.unreadCount > 0) {
+        await socket.emitWithAck("message:ack", {
+          channelId: this.selectedChannel.id,
+          messageId: this.selectedChannel.messages.at(-1).id,
+        });
 
+        this.selectedChannel.unreadCount = 0;
+      }
+    },
     addMessage(message, countAsUnread = false) {
       const channel = this.channels.get(message.channelId);
 
@@ -209,19 +213,8 @@ export const useMainStore = defineStore("main", {
         this.ackLastMessageIfNecessary();
       }
     },
-
-    async ackLastMessageIfNecessary() {
-      if (this.selectedChannel?.unreadCount > 0) {
-        await socket.emitWithAck("message:ack", {
-          channelId: this.selectedChannel.id,
-          messageId: this.selectedChannel.messages.at(-1).id,
-        });
-
-        this.selectedChannel.unreadCount = 0;
-      }
-    },
-
     async sendMessage(content) {
+      // TODO: Only allow messages from logged in users
       const message = {
         id: undefined,
         from: this.currentUser.id,
@@ -243,7 +236,6 @@ export const useMainStore = defineStore("main", {
         message.mid = parseInt(message.id, 10);
       }
     },
-
     async getUser(userId) {
       if (this.currentUser?.id === userId) {
         return this.currentUser;
@@ -290,6 +282,7 @@ export const useMainStore = defineStore("main", {
 
       publicChannels.sort((a, b) => {
         // always put the 'General' channel first
+        // TODO: Change to something else (maybe one `starred`, then list of `pinned`. Then separately have a `favorites` list)
         if (a.name === "General") {
           return -1;
         } else if (b.name === "General") {

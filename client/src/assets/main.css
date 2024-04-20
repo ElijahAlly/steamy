@@ -1,9 +1,10 @@
 @import "./bootstrap.css";
 @import "./base.css";
 
-#app {
-  height: 100%;
+html, body, #app {
+  width: 100vw;
   display: flex;
+  overflow: hidden;
 }
 
 .mw-80 {

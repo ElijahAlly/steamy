@@ -23,10 +23,10 @@ async function logOut() {
       class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-black text-decoration-none"
     >
       <img
-        class="bi pe-none me-2"
-        src="@/assets/logo.svg"
-        width="40"
-        height="32"
+        class="bi pe-none me-2 rounded"
+        src="@/assets/Steamy-logo-light.png"
+        height="42"
+        width="42"
       />
       <span class="fs-4">Socket.IO chat</span>
     </a>

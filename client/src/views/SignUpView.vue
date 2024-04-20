@@ -29,6 +29,7 @@ async function onSubmit() {
       password: password.value,
     });
 
+    console.log(res);
     if (res.status !== 200) {
       errorMessage.value = "Some fields are not valid.";
       isLoading.value = false;
@@ -49,10 +50,10 @@ async function onSubmit() {
 
 <template>
   <div class="d-flex align-items-center w-100">
-    <div class="form m-auto">
+    <div class="form m-auto w-100">
       <form @submit.prevent="onSubmit">
-        <img class="mb-4" src="@/assets/logo.svg" width="72" height="57" />
-        <h1 class="h3 mb-3 fw-normal">Sign up</h1>
+        <img class="mb-4 rounded" src="@/assets/Steamy-logo-light.png" width="72" height="72" />
+        <h1 class="h3 mb-3 fw-normal text-info">Sign up</h1>
 
         <div class="form-floating">
           <input
@@ -79,7 +80,7 @@ async function onSubmit() {
         <v-btn
           type="submit"
           color="primary"
-          class="w-100 my-2 py-2"
+          class="w-100 my-2 py-2 bg-info border-info"
           :loading="isLoading"
           :disabled="!isValid"
         >
@@ -91,8 +92,8 @@ async function onSubmit() {
         </div>
       </form>
 
-      <p class="mt-2">
-        Or <router-link :to="{ name: 'login' }">log in</router-link>.
+      <p class="mt-2 text-light">
+        Or <router-link :to="{ name: 'login' }" class="text-info">log in</router-link>
       </p>
     </div>
   </div>

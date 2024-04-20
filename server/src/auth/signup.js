@@ -13,39 +13,46 @@ const validate = ajv.compile({
 
 export function signup({ app, db }) {
   app.post("/signup", async (req, res) => {
-    if (!validate(req.body)) {
-      return res.status(400).send({
-        message: "invalid payload",
-        errors: validate.errors,
-      });
-    }
-
-    const hashedPassword = await argon2.hash(req.body.password);
-
-    let userId;
-
     try {
-      userId = await db.createUser({
-        username: req.body.username,
-        hashedPassword,
-      });
-    } catch (e) {
+      if (!validate(req.body)) {
+        return res.status(400).send({
+          message: "invalid payload",
+          errors: validate.errors,
+        });
+      }
+
+      const hashedPassword = await argon2.hash(req.body.password);
+
+      let userId;
+
+      try {
+        userId = await db.createUser({
+          username: req.body.username,
+          hashedPassword,
+        });
+      } catch (e) {
+        return res.status(400).send({
+          message: "invalid payload",
+        });
+      }
+
+      logger.info("user [%s] has signed up", userId);
+
+      // the user is logged in right away (no email address to validate)
+      req.login(
+        {
+          id: userId,
+          username: req.body.username,
+        },
+        () => {
+          res.status(200).send(req.user);
+        },
+      );
+    } catch (err) {
+      console.log(err, { message: 'Failed to sign up user.' });
       return res.status(400).send({
-        message: "invalid payload",
-      });
+        message: "Failed to sign up user :/ Please refresh & try again.",
+      }); 
     }
-
-    logger.info("user [%s] has signed up", userId);
-
-    // the user is logged in right away (no email address to validate)
-    req.login(
-      {
-        id: userId,
-        username: req.body.username,
-      },
-      () => {
-        res.status(200).send(req.user);
-      },
-    );
   });
 }

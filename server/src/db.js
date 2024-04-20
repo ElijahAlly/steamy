@@ -77,13 +77,15 @@ export class DB {
   }
 
   createUser({ username, hashedPassword }) {
+    console.log('username', username);
+    console.log('hashedPassword', hashedPassword);
     return doInTransaction(this.pgPool, async (client) => {
       const results = await Promise.all([
         client.query(
           "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id",
           [username, hashedPassword],
         ),
-        client.query("SELECT id FROM channels WHERE name = 'General'"),
+        client.query("SELECT id FROM channels WHERE name = 'General'"), // TODO: Change to starred channel and pinned (capped at 5??)
       ]);
 
       const userId = results[0].rows[0].id;

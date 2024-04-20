@@ -29,12 +29,11 @@ socket.on("disconnect", (reason) => {
   }
 });
 
-const unauthenticatedRoutes = ["login", "signup"];
+const unauthenticatedRoutes = ["login", "signup", "home"];
 
 onBeforeMount(async () => {
   try {
     const res = await BackendService.self();
-
     if (res.status === 200) {
       const user = await res.json();
       store.setCurrentUser(user);
@@ -50,17 +49,23 @@ onBeforeMount(async () => {
 
       return;
     }
-  } catch (e) {}
+  } catch (e) {
+    // console.log(e);
+  }
 
-  if (!unauthenticatedRoutes.includes(route.name)) {
-    const query = {};
-    if (route.path !== "/") {
-      query.returnTo = route.path;
-    }
-    await router.push({
-      name: "login",
-      query,
-    });
+  console.log('name', route.name)
+  console.log('path', route.path)
+  if (unauthenticatedRoutes.includes(route.name)) {
+    // await router.push(route.path);
+  // } else {
+  //   const query = {};
+  //   if (route.path !== "/") {
+  //     query.returnTo = route.path;
+  //   }
+  //   await router.push({
+  //     name: "login",
+  //     query,
+  //   });
   }
 });
 </script>
@@ -72,4 +77,5 @@ onBeforeMount(async () => {
   <SearchUserModal />
 </template>
 
-<style scoped></style>
+<style scoped lang="scss">
+</style>

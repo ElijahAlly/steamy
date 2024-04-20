@@ -63,7 +63,8 @@ const someoneIsTyping = computed(() => {
       usernames.push(username);
     });
 
-    return usernames.join(", ") + " is typing";
+    if (usernames.length <= 1) return usernames[0] + ' is typing...';
+    return usernames.join(" & ") + " are typing...";
   }
 });
 </script>
@@ -96,6 +97,7 @@ const someoneIsTyping = computed(() => {
         >
           Load more
         </v-btn>
+        <!-- TODO: Load more automatically (also, get rid of messges after a certain amount of new messages come in <10 for testing peurposes>) -->
       </div>
 
       <p v-if="!store.messages.length">No message yet</p>
@@ -153,7 +155,7 @@ textarea {
 }
 
 .blinking {
-  animation: blink-frames 2s infinite;
+  animation: blink-frames 1.8s infinite;
 }
 
 @keyframes blink-frames {

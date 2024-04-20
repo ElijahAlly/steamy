@@ -25,6 +25,6 @@ process.on("SIGTERM", async () => {
   await close();
 });
 
-httpServer.listen(3000, () => {
-  logger.info("server listening at http://localhost:3000");
+httpServer.listen(8081, () => {
+  logger.info("server listening at http://localhost:8081");
 });
